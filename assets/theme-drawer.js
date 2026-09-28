@@ -304,7 +304,7 @@ export class ThemeDrawer extends Component {
   /**
    * Slides the drawer out, waits for the animation, then closes the dialog.
    */
-  async #closeDialog() {
+  async #closeDialog({ immediate = false } = {}) {
     if (!this.isOpen) return;
     if (this.#isClosing) return;
     this.#isClosing = true;
@@ -323,9 +323,11 @@ export class ThemeDrawer extends Component {
       // Cancel any in-progress open animation before starting the close.
       panel.classList.remove('theme-drawer__dialog--opening', 'theme-drawer__dialog--opening-inline-start');
 
-      panel.classList.add('theme-drawer__dialog--closing');
-      await onAnimationEnd(panel, undefined, { subtree: false });
-      panel.classList.remove('theme-drawer__dialog--closing');
+      if (!immediate) {
+        panel.classList.add('theme-drawer__dialog--closing');
+        await onAnimationEnd(panel, undefined, { subtree: false });
+        panel.classList.remove('theme-drawer__dialog--closing');
+      }
     }
 
     panel.close();
@@ -360,14 +362,14 @@ export class ThemeDrawer extends Component {
   /**
    * Closes the drawer.
    */
-  async close() {
+  async close({ immediate = false } = {}) {
     if (this.#isClosing) {
       // A close is already in progress — cancel any deferred open so the
       // drawer stays closed when the animation finishes.
       this.#deferredOpen = false;
       return;
     }
-    await this.#closeDialog();
+    await this.#closeDialog({ immediate });
   }
 
   /**

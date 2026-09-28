@@ -32,6 +32,7 @@ class CartDrawerComponent extends Component {
     super.connectedCallback();
     document.addEventListener(StandardEvents.cartLinesUpdate, this.#handleCartLinesUpdate);
     this.#themeDrawer?.addEventListener(DrawerOpenEvent.eventName, this.#handleDrawerOpen);
+    this.addEventListener('click', this.#handleCheckoutClick, true);
 
     // The restore path sets [open] before this module loads, so the
     // theme-drawer:open event will have already fired. Use the attribute
@@ -45,7 +46,20 @@ class CartDrawerComponent extends Component {
     super.disconnectedCallback();
     document.removeEventListener(StandardEvents.cartLinesUpdate, this.#handleCartLinesUpdate);
     this.#themeDrawer?.removeEventListener(DrawerOpenEvent.eventName, this.#handleDrawerOpen);
+    this.removeEventListener('click', this.#handleCheckoutClick, true);
   }
+
+  /**
+   * Close the modal drawer before the MitID app handles the checkout click.
+   * The app listens for clicks on the button and opens its own overlay; on
+   * mobile, an open modal dialog would otherwise cover that overlay.
+   *
+   * @param {MouseEvent} event
+   */
+  #handleCheckoutClick = (event) => {
+    if (!(event.target instanceof Element) || !event.target.closest('.cart__checkout-button')) return;
+    this.#themeDrawer?.close({ immediate: true });
+  };
 
   /**
    * Handles the theme-drawer opening — updates sticky state and wires up the installments CTA.

@@ -284,6 +284,11 @@
 </div>
 
 {% stylesheet %}
+  /* The MitID custom trigger matches the click target against this button. */
+  .cart__checkout-button > .button-text {
+    pointer-events: none;
+  }
+
   .cart-actions {
     display: flex;
     flex-direction: column;
